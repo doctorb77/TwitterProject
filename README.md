@@ -1,6 +1,6 @@
-# Project 5 - TwitterBasic
+# Project 5 - TwitterDark
 
-TwitterBasic is a basic twitter app to read and compose tweets the [Twitter API](https://apps.twitter.com/).
+TwitterDark is a basic twitter app to read and compose tweets the [Twitter API](https://apps.twitter.com/).
 
 Time spent: 15 hours spent in total
 
