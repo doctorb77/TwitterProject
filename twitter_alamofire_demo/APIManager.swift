@@ -15,14 +15,16 @@ import KeychainAccess
 class APIManager: SessionManager {
     
     // MARK: TODO: Add App Keys
-    static let consumerKey = "TXVthqTiRZlKSuPgk9kMEK6Sy"
-    static let consumerSecret = "tzmiLDtMLRYnnebCxDYNTPvKZYeQ5owZQo8faiXFuTGId7ZgfK"
+    static let consumerKey = "hVdG8NYpF1aYHJUf7Gl0r1sA2"
+    static let consumerSecret = "JHDYJalszwXgJidh1hfPbarGsciLtTQMNVGzbfDihnJLdaQTyJ"
 
     static let requestTokenURL = "https://api.twitter.com/oauth/request_token"
     static let authorizeURL = "https://api.twitter.com/oauth/authorize"
     static let accessTokenURL = "https://api.twitter.com/oauth/access_token"
     
     static let callbackURLString = "alamoTwitter://"
+    
+    static var lastTweet:[Tweet] = []
     
     // MARK: Twitter API methods
     func login(success: @escaping () -> (), failure: @escaping (Error?) -> ()) {
@@ -41,6 +43,7 @@ class APIManager: SessionManager {
                     print("Welcome \(user.name)")
                     
                     // MARK: TODO: set User.current, so that it's persisted
+                    User.current = user
                     
                     success()
                 }
@@ -50,11 +53,13 @@ class APIManager: SessionManager {
         }
     }
     
-    func logout() {
-        clearCredentials()
+    static func logout() {
+        // 1. Clear current user
+        User.current = nil
         
-        // TODO: Clear current user by setting it to nil
-
+        // TODO: 2. Deauthorize OAuth tokens
+        
+        // 3. Post logout notification
         NotificationCenter.default.post(name: NSNotification.Name("didLogout"), object: nil)
     }
 
@@ -75,11 +80,14 @@ class APIManager: SessionManager {
                 }
         }
     }
+    
+   
         
     func getHomeTimeLine(completion: @escaping ([Tweet]?, Error?) -> ()) {
 
         // This uses tweets from disk to avoid hitting rate limit. Comment out if you want fresh
         // tweets,
+        
         if let data = UserDefaults.standard.object(forKey: "hometimeline_tweets") as? Data {
             let tweetDictionaries = NSKeyedUnarchiver.unarchiveObject(with: data) as! [[String: Any]]
             let tweets = tweetDictionaries.flatMap({ (dictionary) -> Tweet in
@@ -108,7 +116,6 @@ class APIManager: SessionManager {
                     let data = NSKeyedArchiver.archivedData(withRootObject: tweetDictionaries)
                     UserDefaults.standard.set(data, forKey: "hometimeline_tweets")
                     UserDefaults.standard.synchronize()
-
                     let tweets = tweetDictionaries.flatMap({ (dictionary) -> Tweet in
                         Tweet(dictionary: dictionary)
                     })
@@ -118,12 +125,97 @@ class APIManager: SessionManager {
     }
     
     // MARK: TODO: Favorite a Tweet
+    func favorite(_ tweet: Tweet, completion: @escaping (Tweet?, Error?) -> ()) {
+        let urlString = "https://api.twitter.com/1.1/favorites/create.json"
+        let parameters = ["id": tweet.id]
+        request(urlString, method: .post, parameters: parameters, encoding: URLEncoding.queryString).validate().responseJSON { (response) in
+            if response.result.isSuccess,
+                let tweetDictionary = response.result.value as? [String: Any] {
+                let tweet = Tweet(dictionary: tweetDictionary)
+                completion(tweet, nil)
+            } else {
+                completion(nil, response.result.error)
+            }
+        }
+    }
     
     // MARK: TODO: Un-Favorite a Tweet
+    func unfavorite(_ tweet: Tweet, completion: @escaping (Tweet?, Error?) -> ()) {
+        let urlString = "https://api.twitter.com/1.1/favorites/destroy.json"
+        let parameters = ["id": tweet.id]
+        request(urlString, method: .post, parameters: parameters, encoding: URLEncoding.queryString).validate().responseJSON { (response) in
+            if response.result.isSuccess,
+                let tweetDictionary = response.result.value as? [String: Any] {
+                let tweet = Tweet(dictionary: tweetDictionary)
+                completion(tweet, nil)
+            } else {
+                completion(nil, response.result.error)
+            }
+        }
+    }
     
     // MARK: TODO: Retweet
+    func retweet(_ tweet: Tweet, completion: @escaping (Tweet?, Error?) -> ()) {
+        let urlString = "https://api.twitter.com/1.1/statuses/retweet.json"
+        let parameters = ["id": tweet.id]
+        request(urlString, method: .post, parameters: parameters, encoding: URLEncoding.queryString).validate().responseJSON { (response) in
+            if response.result.isSuccess,
+                let tweetDictionary = response.result.value as? [String: Any] {
+                let tweet = Tweet(dictionary: tweetDictionary)
+                completion(tweet, nil)
+            } else {
+                completion(nil, response.result.error)
+            }
+        }
+    }
     
     // MARK: TODO: Un-Retweet
+    func unretweet(_ tweet: Tweet, completion: @escaping (Tweet?, Error?) -> ()) {
+        let urlString = "https://api.twitter.com/1.1/statuses/unretweet.json"
+        let parameters = ["id": tweet.id]
+        request(urlString, method: .post, parameters: parameters, encoding: URLEncoding.queryString).validate().responseJSON { (response) in
+            if response.result.isSuccess,
+                let tweetDictionary = response.result.value as? [String: Any] {
+                let tweet = Tweet(dictionary: tweetDictionary)
+                completion(tweet, nil)
+            } else {
+                completion(nil, response.result.error)
+            }
+        }
+    }
+    
+    func getHomeTimeLine(withMaxId last: Int64?, completion: @escaping ([Tweet]?, Error?) -> ()) {
+        
+        let url = "https://api.twitter.com/1.1/statuses/home_timeline.json?max_id=\(last ?? 0)"
+
+        print(url)
+        
+        request(URL(string: url)!, method: .get)
+            .validate()
+            .responseJSON { (response) in
+                switch response.result {
+                case .failure(let error):
+                    completion(nil, error)
+                    return
+                case .success:
+                    guard let tweetDictionaries = response.result.value as? [[String: Any]] else {
+                        print("Failed to parse tweets")
+                        let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Failed to parse tweets"])
+                        completion(nil, error)
+                        return
+                    }
+                    
+                    let data = NSKeyedArchiver.archivedData(withRootObject: tweetDictionaries)
+                    UserDefaults.standard.set(data, forKey: "hometimeline_tweets")
+                    UserDefaults.standard.synchronize()
+                    
+                    let tweets = tweetDictionaries.flatMap({ (dictionary) -> Tweet in
+                        Tweet(dictionary: dictionary)
+                    })
+                    completion(tweets, nil)
+                }
+        }
+    }
     
     // MARK: TODO: Compose Tweet
     
@@ -194,6 +286,7 @@ class APIManager: SessionManager {
         // Store access token in keychain
         let keychain = Keychain()
         do {
+            User.current = nil
             try keychain.remove("twitter_credentials")
         } catch let error {
             print("error: \(error)")

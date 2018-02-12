@@ -9,48 +9,55 @@ Time spent: **X** hours spent in total
 The following **required** functionality is completed:
 
 - [x] User sees app icon in home screen and styled launch screen
-- [ ] User can sign in using OAuth login flow
-- [ ] User can Logout
-- [ ] Data model classes
-- [ ] User can view last 20 tweets from their home timeline with the user profile picture, username, tweet text, and timestamp.
-- [ ] User can pull to refresh.
-- [ ] User can tap the retweet and favorite buttons in a tweet cell to retweet and/or favorite a tweet.
-- [ ] Using AutoLayout, the Tweet cell should adjust it's layout for iPhone 7, Plus and SE device sizes as well as accommodate device rotation.
+- [x] User can sign in using OAuth login flow
+- [x] User can Logout
+- [x] Data model classes
+- [x] User can view last 20 tweets from their home timeline with the user profile picture, username, tweet text, and timestamp.
+- [x] User can pull to refresh.
+- [x] User can tap the retweet and favorite buttons in a tweet cell to retweet and/or favorite a tweet.
+- [x] Using AutoLayout, the Tweet cell should adjust it's layout for iPhone 7, Plus and SE device sizes as well as accommodate device rotation.
 
 The following **stretch** features are implemented:
 
-- [ ] The current signed in user will be persisted across restarts
-- [ ] Each tweet should display the relative timestamp for each tweet "8m", "7h"
-- [ ] User should be able to unretweet and unfavorite and should decrement the retweet and favorite count.
-- [ ] Links in tweets are clickable.
+- [x] The current signed in user will be persisted across restarts
+- [x] Each tweet should display the relative timestamp for each tweet "8m", "7h"
+- [x] User should be able to unretweet and unfavorite and should decrement the retweet and favorite count.
+- [x] Links in tweets are clickable.
 - [ ] User can load more tweets once they reach the bottom of the feed using infinite loading similar to the actual Twitter client.
 
 The following **additional** features are implemented:
 
-- [ ] List anything else that you can get done to improve the app functionality!
+- [x] Retweet icon to signify if a given tweet is original content or was retweeted by the useradditional
+- [x] Custom retweet and favorite icons made to support the dark theme
+- [x] Highlighted Hashtags and User mentions
+- [x] Username set as title and custom navBarButton with the user's profile picture
+- [x] Customized UIActivityIndicator for when tweets are loading in
+- [x] Refresh background displays the user's twitter background picture if they have one whenever they pull down to refresh the page
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1.
-2.
+1. How to grab tweets by id
+2. What are these custom methods inside of method headers
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://i.imgur.com/5dboTXN.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+Could not for the life of me figure out how to do infinite scrolling
 
 ## Credits
 
 List an 3rd party libraries, icons, graphics, or other assets you used in your app.
 
 - [AFNetworking](https://github.com/AFNetworking/AFNetworking) - networking task library
+- [ActiveLabel](https://github.com/optonaut/ActiveLabel.swift) - custom label library
+- [DateTools](https://github.com/MatthewYork/DateTools) - robust date library
 
 ## License
 
