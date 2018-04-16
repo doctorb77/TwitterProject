@@ -31,15 +31,7 @@ class TweetCell: UITableViewCell {
     var tweet: Tweet! {
         didSet {
             let tBlue = UIColor(red: 43/255, green: 166/255, blue: 209/255, alpha: 1)
-            //tweetTextLabel.text = tweet.text
-            //tweetTextLabel.URLSelectedColor = tBlue
-            /*
-            tweetTextLabel.handleURLTap { message in
-                UIApplication.shared.open(message, options: [:], completionHandler: {
-                    (success) in
-                    print("Opening link...")
-                })
-            } */
+            
             newLabel.enabledTypes = [.url, .hashtag, .mention]
             newLabel.text = tweet.text
             newLabel.hashtagColor = tBlue
@@ -51,7 +43,6 @@ class TweetCell: UITableViewCell {
                 
                 })
              }
-            
             
             nameTextLabel.text = tweet.username
             dateTextLabel.text = tweet.createdAtString
@@ -70,7 +61,9 @@ class TweetCell: UITableViewCell {
         
             if (tweet.isQuote) {
                 rtLogo.isHidden = false
-                rtLogo.image = #imageLiteral(resourceName: "retweet_blue")
+                let subUrl = URL(string: tweet.subProfileUrl)!
+                rtLogo.af_setImage(withURL: subUrl)
+    
                 rtBackground.isHidden = false
             } else {
 
@@ -86,9 +79,9 @@ class TweetCell: UITableViewCell {
                 if (tweet.retweetCount == 0) {
                     tweet.retweetCount = 1
                 }
-                rtImage.imageView?.image = #imageLiteral(resourceName: "retweet_blue")
+                rtImage.setImage(#imageLiteral(resourceName: "retweet_blue"), for: UIControlState.normal)
             } else {
-                rtImage.imageView?.image = #imageLiteral(resourceName: "retweet_grey")
+                rtImage.setImage(#imageLiteral(resourceName: "retweet_grey"), for: UIControlState.normal)
             }
             
             if (tweet.favorited == true) {
@@ -109,12 +102,14 @@ class TweetCell: UITableViewCell {
         
     }
     
-    @IBAction func didTapFavorite(_ sender: Any) {
+    @IBAction func didTapFavorite(_ sender: UIButton) {
         
         tweet.favorited = !(tweet.favorited)
-     
+        
         if (tweet.favorited == true) {
  
+            sender.heartBeat()
+            
             tweet.favoriteCount = tweet.favoriteCount + 1
             favImage.setImage(#imageLiteral(resourceName: "favorite_red"), for: UIControlState.normal)
             
@@ -130,6 +125,8 @@ class TweetCell: UITableViewCell {
             tweet.favoriteCount = tweet.favoriteCount - 1
             favImage.setImage(#imageLiteral(resourceName: "favorite_grey"), for: UIControlState.normal)
             
+            sender.shake()
+            
             APIManager.shared.unfavorite(tweet) { (tweet: Tweet?, error: Error?) in
                 if let  error = error {
                     print("Error unfavoriting tweet: \(error.localizedDescription)")
@@ -139,21 +136,24 @@ class TweetCell: UITableViewCell {
             }
         }
         
-        TimelineViewController.tvPoint.reloadData()
+        favCountLabel.text = "\(tweet.favoriteCount)"
     }
+
     
-    @IBAction func didTapRetweet(_ sender: Any) {
-        tweet.retweeted = !(tweet.retweeted)
+    @IBAction func didTapRetweet(_ sender: UIButton) {
         
+        tweet.retweeted = !(tweet.retweeted)
         if (tweet.retweeted == true) {
             tweet.retweetCount = tweet.retweetCount + 1
             rtImage.setImage(#imageLiteral(resourceName: "retweet_blue"), for: UIControlState.normal)
             
+            sender.flash()
+            
             APIManager.shared.retweet(tweet) { (tweet: Tweet?, error: Error?) in
                 if let  error = error {
-                    print("Error retweeting tweet: \(error.localizedDescription)")
+                    //print("Error retweeting tweet: \(error.localizedDescription)")
                 } else if let tweet = tweet {
-                    print("Successfully retweeted the following Tweet: \n\(tweet.text)")
+                    //print("Successfully retweeted the following Tweet: \n\(tweet.text)")
                 }
             }
             
@@ -161,16 +161,25 @@ class TweetCell: UITableViewCell {
             tweet.retweetCount = tweet.retweetCount - 1
             rtImage.setImage(#imageLiteral(resourceName: "retweet_grey"), for: UIControlState.normal)
             
+            sender.shake()
+            
             APIManager.shared.unretweet(tweet) { (tweet: Tweet?, error: Error?) in
                 if let  error = error {
-                    print("Error unretweeting tweet: \(error.localizedDescription)")
+                    //print("Error unretweeting tweet: \(error.localizedDescription)")
                 } else if let tweet = tweet {
-                    print("Successfully unretweeted the following Tweet: \n\(tweet.text)")
+                    //print("Successfully unretweeted the following Tweet: \n\(tweet.text)")
                 }
             }
         }
         
-        TimelineViewController.tvPoint.reloadData()
+        rtCountLabel.text = "\(tweet.retweetCount)"
+    }
+    
+
+    @IBAction func pushFavorite(_ sender: UIButton) {
+        //sender.pulsate()
+        sender.tintColor = UIColor.red
+        didTapFavorite(sender)
     }
     
     

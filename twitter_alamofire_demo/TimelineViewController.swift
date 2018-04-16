@@ -10,12 +10,17 @@ import UIKit
 
 import AlamofireImage
 
-class TimelineViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+class TimelineViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, ComposeViewControllerDelegate {
+    
+    func did(post: Tweet) {
+        
+    }
     
     var tweets: [Tweet] = []
     var isMoreDataLoading: Bool = false
     var profilePic:UIImage = UIImage()
     var profContainer:UIImageView = UIImageView()
+    var topButton:UIBarButtonItem = UIBarButtonItem();
     
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
@@ -24,6 +29,7 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet weak var backImage: UIImageView!
     @IBOutlet weak var BackView: UIView!
+    
     /*
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if (!isMoreDataLoading) {
@@ -137,6 +143,8 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
                 button.layer.cornerRadius = 0.5 * button.bounds.size.width
                 let barButton = UIBarButtonItem()
                 barButton.customView = button
+                
+                self.topButton = barButton
         //      self.navigationItem.rightBarButtonItem = barButton
                 
     /*
@@ -162,6 +170,22 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
                 
                 print("BANANA")
                 
+            }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "Compose" {
+            let destinationNavController = segue.destination as! UINavigationController
+            let destination = destinationNavController.topViewController as! ComposeViewController
+            destination.delegate = self
+ 
+        } else {
+            let post = sender as! UITableViewCell
+            if let indexPath = tableView.indexPath(for: post) {
+                let tweet = tweets[indexPath.row]
+                let tweetDetailViewController = segue.destination as! TweetDetailViewController
+                tweetDetailViewController.tweet = tweet
             }
         }
     }
@@ -202,7 +226,9 @@ class TimelineViewController: UIViewController, UITableViewDelegate, UITableView
         // Dispose of any resources that can be recreated.
     }
     
-    
+    @IBAction func didTapPost(_ sender: Any) {
+        
+    }
     
     @IBAction func didTapLogout(_ sender: Any) {
         APIManager.logout()

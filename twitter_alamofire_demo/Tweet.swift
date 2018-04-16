@@ -23,15 +23,56 @@ class Tweet {
     var username: String
     var createdAtString: String // Display date
     var profileImageUrl: String
+    var subProfileUrl: String
     var screenName: String
     var isQuote: Bool
     var timeAgo: String
+    var following: Bool
+    var subUserName: String
+    var subName: String
+    var rawText: String
+    var verified: Bool
+    
+    var retweetedByUser: User?
     
     // MARK: - Create initializer with dictionary
     init(dictionary: [String: Any]) {
         id = dictionary["id"] as! Int64
-        text = dictionary["text"] as! String
+        /*
+        text = ""
+        if let text = dictionary["full_text"] as? String {
+            
+        } else {
+            text = dictionary["text"] as! String
+        }
+        */
         
+        var dictionary = dictionary
+        subProfileUrl = ""
+        subName = ""
+        subUserName = ""
+        rawText = ""
+        if let origin = dictionary["retweeted_status"] as? [String: Any] {
+            let userDictionary = dictionary["user"] as! [String: Any]
+            self.retweetedByUser = User(dictionary: userDictionary)
+            
+            dictionary = origin
+            
+            rawText = dictionary["full_text"] as! String
+            
+            dictionary["full_text"] = "Retweeted by @" + (userDictionary["screen_name"] as! String + ":\n" + (dictionary["full_text"] as! String))
+        
+            
+            print("BABBLE")
+            print(rawText)
+            print("PORTABLES")
+            subProfileUrl = userDictionary["profile_image_url_https"] as! String
+            subProfileUrl = subProfileUrl.replacingOccurrences(of: "_normal", with: "")
+            subName = userDictionary["name"] as! String
+            subUserName = userDictionary["screen_name"] as! String
+        }
+       
+        text = dictionary["full_text"] as! String
         favoriteCount = dictionary["favorite_count"] as! Int
         favorited = dictionary["favorited"] as! Bool
         retweeted = dictionary["retweeted"] as! Bool
@@ -39,16 +80,18 @@ class Tweet {
         let user = dictionary["user"] as! [String: Any]
         self.user = User(dictionary: user)
         
-        if let egg = dictionary["retweeted_status"] {
+        if (subProfileUrl != "") {
             isQuote = true
         } else {
             isQuote = false
         }
         profileImageUrl = user["profile_image_url_https"] as! String
+        profileImageUrl = profileImageUrl.replacingOccurrences(of: "_normal", with: "")
         username = user["name"] as! String
         screenName = user["screen_name"] as! String
         retweetCount = dictionary["retweet_count"] as! Int
-        
+        following = user["following"] as! Bool
+        verified = user["verified"] as! Bool
         
         let createdAtOriginalString = dictionary["created_at"] as! String
         let formatter = DateFormatter()
