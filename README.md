@@ -1,4 +1,4 @@
-# Project 5 - TwitterDark
+# Project 6 - TwitterDark
 
 TwitterDark is a basic twitter app to read and compose tweets the [Twitter API](https://apps.twitter.com/).
 
@@ -33,11 +33,12 @@ The following **additional** features are implemented:
 - [x] Username set as title and custom navBarButton with the user's profile picture
 - [x] Customized UIActivityIndicator for when tweets are loading in
 - [x] Refresh background displays the user's twitter background picture if they have one whenever they pull down to refresh the page
+- [x] Detail view has custom animaitons on buttons for following and replying to tweets / users
+- [x] Favorite and retweet icons have custom animations
+- [x] Custom theming on detail view to show accounts associated with tweet
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1. How to grab tweets by id
-2. What are these custom methods inside of method headers
 
 ## Video Walkthrough
 
@@ -46,7 +47,7 @@ Here's a walkthrough of implemented user stories:
 <img src='https://i.imgur.com/u1k0g94.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 This walkthrough shows the user persitence:
-<img src='https://i.imgur.com/rV8eMuS.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://i.imgur.com/w2BnxxO.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
